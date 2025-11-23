@@ -89,7 +89,6 @@ if menu_selection == "1. Simulación Masa-Resorte":
     
     st.header("1️⃣ Simulación de Masa-Resorte")
     st.markdown("Este módulo permite analizar las variables cinemáticas y energéticas del sistema masa-resorte.")
-    
     st.subheader("📚 Fundamentos Teóricos")
     st.latex(r"x(t) = A \cos(\omega t + \phi)")
     st.latex(r"\omega = \sqrt{\frac{k}{m}} \quad \text{(Frecuencia Angular)}")
@@ -174,7 +173,6 @@ elif menu_selection == "2. Simulación Péndulo Simple":
     
     st.header("2️⃣ Simulación de Péndulo Simple")
     st.markdown("Análisis de las oscilaciones de un péndulo simple, comparando el modelo lineal (MAS) con la solución no lineal (Ecuación completa).")
-    
     st.subheader("🛠️ Parámetros del Sistema")
     
     col1, col2, col3 = st.columns(3)
@@ -235,7 +233,6 @@ elif menu_selection == "3. Análisis de Parámetros ($k$ y $m$)":
     
     st.header("3️⃣ Análisis del Efecto de la Constante Elástica ($k$) y la Masa ($m$)")
     st.markdown("Explore cómo la rigidez del resorte ($k$) y la inercia de la masa ($m$) afectan el Periodo ($T$) del MAS.")
-    
     
     st.subheader("📚 Relación Fundamental")
     st.markdown("El periodo de oscilación ($T$) de un sistema masa-resorte está dado por:")
@@ -305,7 +302,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.subheader("4.1. MAS con Amortiguamiento")
         st.markdown("Se añade una fuerza de arrastre proporcional a la velocidad ($\mathbf{F_c} = -c \mathbf{v}$).")
         
-        
         st.subheader("🛠️ Parámetros y Ecuación")
         
         col1, col2, col3 = st.columns(3)
@@ -354,7 +350,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.subheader("4.2. MAS Forzado")
         st.markdown("Se añade una fuerza externa periódica ($\mathbf{F_{ext}} = F_0 \cos(\omega_f t)$) al sistema amortiguado.")
         
-        
         st.subheader("🛠️ Parámetros y Ecuación")
         
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -401,10 +396,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     elif extended_case == "Superposición de Oscilaciones":
         st.subheader("4.3. Superposición de Oscilaciones")
         st.markdown("Se analiza la suma de dos movimientos armónicos simples con frecuencias y amplitudes diferentes. Se pueden generar los fenómenos de **batido** (Beats).")
-        
-
-[Image of a beat frequency pattern resulting from the superposition of two sine waves of slightly different frequencies]
-
         
         st.subheader("🛠️ Parámetros de las Dos Oscilaciones")
         

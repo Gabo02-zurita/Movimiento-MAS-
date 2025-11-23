@@ -41,36 +41,73 @@ if 'damped_run' not in st.session_state:
 if 'forced_run' not in st.session_state:
     st.session_state.forced_run = False
 
-# Estilo UTA
+# Estilo UTA Mejorado con Fondo de Ingeniería
 def apply_custom_style():
-    # Estilo básico de la UTA (Azul Oscuro, Naranja)
-    st.markdown("""
+    # URL o Base64 de la imagen de fondo (FONDOS GRISES O NEUTROS FUNCIONAN MEJOR)
+    # >>> REEMPLAZA ESTO CON LA URL DE TU IMAGEN DE INGENIERÍA <<<
+    BACKGROUND_IMAGE_URL = "https://i.imgur.com/K1i797n.png" # Usando un marcador de posición de engranajes
+
+    st.markdown(f"""
         <style>
-        .reportview-container {
-            background: #FFFFFF;
-        }
-        .sidebar .sidebar-content {
-            background: #25447C; /* Azul Oscuro UTA */
+        /* Estilo Principal y Fondo de Ingeniería */
+        .main {{
+            background-image: url({BACKGROUND_IMAGE_URL});
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-position: center;
+        }}
+        /* Asegura que el contenido del Streamlit tenga un fondo blanco/claro para la lectura */
+        .stApp {{
+            background: rgba(255, 255, 255, 0.9); /* Fondo blanco con 90% de opacidad sobre la imagen */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }}
+
+        /* Sidebar: Mantenemos el color corporativo (Azul Oscuro UTA) para contraste */
+        .sidebar .sidebar-content {{
+            background-color: #25447C; /* Azul Oscuro UTA */
             color: white;
-        }
-        .css-1d391kg { /* Estilo del título en el sidebar */
-            color: white !important;
-        }
-        .css-1lcbmhc { /* Estilo general del texto en sidebar */
-            color: white;
-        }
-        .stButton>button {
-            background-color: #F89921; /* Naranja UTA (Ajustado para mejor visibilidad) */
-            color: white;
-            border-radius: 5px;
+            padding-top: 20px;
+        }}
+        
+        /* Títulos en Sidebar (para asegurar la legibilidad en blanco) */
+        .css-1d391kg, .stRadio label, .stSlider label {{
+            color: white !important; 
+        }}
+        
+        /* Botones con estilo Naranja/Amarillo (UTA) */
+        .stButton>button {{
+            background-color: #F89B2B; /* Naranja UTA */
+            color: #25447C; /* Texto Azul Oscuro */
+            border: 2px solid #25447C;
+            border-radius: 8px;
             font-weight: bold; 
-        }
-        h1, h2, h3 {
+            transition: 0.3s;
+        }}
+        .stButton>button:hover {{
+            background-color: #FFC064; /* Naranja más claro al pasar el ratón */
+            border: 2px solid #25447C;
+        }}
+        
+        /* Títulos Principales (Mejor contraste) */
+        h1, h2, h3 {{
             color: #25447C; /* Azul Oscuro UTA */
-        }
-        .stMarkdown p {
+            border-bottom: 2px solid #F89B2B; /* Línea naranja de separación sutil */
+            padding-bottom: 5px;
+            margin-top: 15px;
+        }}
+        .stMarkdown p, .stAlert p {{
             font-size: 1.05em;
-        }
+            color: #333333; /* Color de texto estándar */
+        }}
+        
+        /* Mejorar la apariencia de los inputs numéricos */
+        .stNumberInput div[data-baseweb="input"] input {{
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }}
+
         </style>
         """, unsafe_allow_html=True)
     

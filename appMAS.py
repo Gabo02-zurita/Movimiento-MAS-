@@ -45,7 +45,7 @@ if 'forced_run' not in st.session_state:
 def apply_custom_style():
     # URL o Base64 de la imagen de fondo (FONDOS GRISES O NEUTROS FUNCIONAN MEJOR)
     # >>> REEMPLAZA ESTO CON LA URL DE TU IMAGEN DE INGENIERÍA <<<
-    BACKGROUND_IMAGE_URL = "https://postimg.cc/CnHdj0vK" # Usando un marcador de posición de engranajes
+    BACKGROUND_IMAGE_URL = "<a href='https://postimg.cc/CnHdj0vK' target='_blank'><img src='https://i.postimg.cc/sxbSCD75/Gemini-Generated-Image-f3tielf3tielf3ti.png' border='0' alt='Gemini-Generated-Image-f3tielf3tielf3ti'></a>" # Usando un marcador de posición de engranajes
 
     st.markdown(f"""
         <style>

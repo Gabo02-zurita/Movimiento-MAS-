@@ -423,7 +423,10 @@ elif menu_selection == "2. Simulación Péndulo Simple":
 
     st.subheader("💡 Explicación Física")
     st.markdown(r"""
-    * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$.
+    * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$. 
+
+[Image of simple pendulum diagram showing small angle approximation]
+
     * Para ángulos grandes (como los **%s°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
     """ % theta_0_deg)
 
@@ -500,7 +503,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     
     st.markdown("---")
     
-    # CORRECCIÓN DE NAMERROR: Definir y_pos para las animaciones horizontales
+    # CORRECCIÓN DE NAMERROR #1: Definir y_pos para las animaciones horizontales
     y_pos = 0 
     
     # ----------------------------------------------------
@@ -649,6 +652,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         sol_f = odeint(forced_mas_ode, y0_f, t_f, args=(k_f, m_f, c_f, F0, w_f))
         x_f = sol_f[:, 0]
         
+        # CORRECCIÓN DE NAMERROR #2: Mover el cálculo aquí
         omega_n = np.sqrt(k_f / m_f)
         
         # --- Gráfico de Posición vs. Tiempo ---
@@ -792,11 +796,12 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         st.subheader("💡 Fenómeno de Batido (Beats)")
         if abs(w1 - w2) < 2:
+            # CORRECCIÓN DE NAMERROR #3: Calcular w_beat y T_beat aquí
             w_beat = abs(w1 - w2)
             T_beat = 2 * np.pi / w_beat
             st.markdown(f"""
             * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**.
-            * La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \text{ rad/s}**$.
+            * La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \text{ rad/s}**$. 
             * Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \approx **{T_beat:.2f} \text{ s}**$.
             """)
         else:

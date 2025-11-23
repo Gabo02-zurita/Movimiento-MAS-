@@ -320,10 +320,11 @@ elif menu_selection == "2. Simulación Péndulo Simple":
 
 
     st.subheader("💡 Explicación Física")
-    st.markdown(f"""
-    * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde $\sin(\Theta) \approx \Theta$.
-    * Para ángulos grandes (como los **{theta_0_deg:.2f}°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
-    """)
+    # Línea corregida: usando r""" para manejar backslashes y $latex$
+    st.markdown(r"""
+    * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$. 
+    * Para ángulos grandes (como los **%s°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
+    """ % theta_0_deg)
 
 
 # ----------------------------------------------------

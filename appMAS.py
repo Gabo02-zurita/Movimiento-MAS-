@@ -43,12 +43,9 @@ if 'forced_run' not in st.session_state:
 
 # Estilo UTA Mejorado con Fondo de Ingeniería
 def apply_custom_style():
-    # URL de la imagen de fondo generada (Planos y engranajes)
-    # 
-
-[Image of technical blueprints and gears for mechanical engineering background with 'UTA' text]
-
-    BACKGROUND_IMAGE_URL = "http://googleusercontent.com/image_generation_content/0" 
+    # URL o Base64 de la imagen de fondo (FONDOS GRISES O NEUTROS FUNCIONAN MEJOR)
+    # >>> REEMPLAZA ESTO CON LA URL DE TU IMAGEN DE INGENIERÍA <<<
+    BACKGROUND_IMAGE_URL = "https://i.imgur.com/K1i797n.png" # Usando un marcador de posición de engranajes
 
     st.markdown(f"""
         <style>

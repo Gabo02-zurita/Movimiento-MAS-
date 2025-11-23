@@ -503,9 +503,11 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     
     st.markdown("---")
     
-    # CORRECCIÓN DE NAMERROR #1: Definir y_pos para las animaciones horizontales
-    # Esto asegura que y_pos exista para todas las subsecciones de animación.
-    y_pos = 0 
+    # INICIALIZACIÓN DE VARIABLES CRÍTICAS (PARA EVITAR NAMERRORS AL CAMBIAR DE PESTAÑA)
+    y_pos = 0 # Para animaciones horizontales
+    omega_n = 0.0
+    w_beat = 0.0
+    T_beat = 0.0
     
     # ----------------------------------------------------
     # 4.1. MAS con Amortiguamiento
@@ -647,7 +649,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
         T_max_f = st.slider("Tiempo Máximo de Simulación ($t_{max}$) [s] | Forzado", 5.0, 50.0, 30.0, 1.0)
         
-        # CÁLCULO CORREGIDO: Definido antes de la simulación ODE
+        # CÁLCULO DE omega_n (sobrescribe el valor inicial de 0.0)
         omega_n = np.sqrt(k_f / m_f)
         
         # Simulación
@@ -798,7 +800,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         st.subheader("💡 Fenómeno de Batido (Beats)")
         if abs(w1 - w2) < 2:
-            # CÁLCULO CORREGIDO: Definido dentro del condicional donde se usa
+            # CÁLCULO DE w_beat y T_beat (sobrescribe los valores iniciales de 0.0)
             w_beat = abs(w1 - w2)
             T_beat = 2 * np.pi / w_beat
             st.markdown(f"""

@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from scipy.integrate import odeint
+import time # <<< NECESARIO PARA LA ANIMACIÓN VISUAL
 
 # --- Funciones de Simulación (ODEs) ---
 
@@ -182,28 +183,26 @@ elif menu_selection == "2. Simulación Péndulo Simple":
     with col2:
         g = st.number_input("Aceleración de Gravedad ($g$) [m/s²]", value=9.81, min_value=0.1, step=0.1, format="%.2f")
     with col3:
-        theta_0_deg = st.number_input("Ángulo Inicial ($\Theta_0$) [grados]", value=10.0, min_value=0.1, max_value=179.0, step=5.0, format="%.2f")
+        theta_0_deg = st.number_input("Ángulo Inicial ($\Theta_0$) [grados]", value=30.0, min_value=0.1, max_value=179.0, step=5.0, format="%.2f")
     
     T_max = st.slider("Tiempo Máximo de Simulación ($t_{max}$) [s]", 5.0, 30.0, 15.0, 1.0)
     
     theta_0 = np.deg2rad(theta_0_deg)  # Convertir a radianes
     
-    # Cálculos fundamentales
+    # Cálculos fundamentales y solución de la ODE
     omega_lin = np.sqrt(g / L)
     T_lin = 2 * np.pi / omega_lin
     t = np.linspace(0, T_max, 500)
     
-    # Modelo Lineal (MAS)
     theta_lin = theta_0 * np.cos(omega_lin * t)
     
-    # Modelo No Lineal (Solución Numérica de la ODE)
     y0 = [theta_0, 0.0]  # [Ángulo inicial, Velocidad angular inicial]
     sol = odeint(pendulum_ode, y0, t, args=(g, L))
     theta_nonlin = sol[:, 0]
     
     st.markdown(f"***Periodo Lineal ($T$):*** **{T_lin:.2f} s**")
     
-    # --- Gráfica de Ángulo vs. Tiempo ---
+    # --- Gráfica de Ángulo vs. Tiempo (Simulación Gráfica) ---
     st.subheader("📊 Comparación: Modelo Lineal vs. No Lineal")
     
     fig_pendulum = go.Figure()
@@ -220,11 +219,74 @@ elif menu_selection == "2. Simulación Péndulo Simple":
     )
     st.plotly_chart(fig_pendulum, use_container_width=True)
     
+    # --- Sección de Animación Visual ---
+    
+    # 1. Calcular coordenadas cartesianas (X, Y)
+    # Suspensión en (0, 0). Y es negativo (hacia abajo)
+    x_coords = L * np.sin(theta_nonlin)
+    y_coords = -L * np.cos(theta_nonlin)
+
+    st.subheader("🎬 Animación Visual del Péndulo Simple")
+    st.markdown("La simulación visual muestra la posición de la masa durante el movimiento en tiempo real.")
+
+    animation_placeholder = st.empty()
+    
+    # Reducir el número de puntos para una animación más fluida (solo 50 fotogramas)
+    t_anim = np.linspace(0, T_max, 50) 
+    x_anim = np.interp(t_anim, t, x_coords)
+    y_anim = np.interp(t_anim, t, y_coords)
+
+    for i in range(len(t_anim)):
+        
+        # Crear la figura Plotly para la representación física
+        fig_animation = go.Figure()
+        
+        # 1. Traza de la Cuerda (Línea desde el origen hasta la masa)
+        fig_animation.add_trace(go.Scatter(
+            x=[0, x_anim[i]], y=[0, y_anim[i]],
+            mode='lines', name='Cuerda (L)', 
+            line=dict(color='gray', width=2)
+        ))
+        
+        # 2. Traza de la Masa (Punto)
+        fig_animation.add_trace(go.Scatter(
+            x=[x_anim[i]], y=[y_anim[i]],
+            mode='markers', name='Masa', 
+            marker=dict(size=20, color='#25447C') # Azul UTA
+        ))
+        
+        # 3. Trayectoria (Para contexto visual, usar todos los puntos calculados)
+        fig_animation.add_trace(go.Scatter(
+            x=x_coords, y=y_coords,
+            mode='lines', name='Trayectoria', 
+            line=dict(color='#F89B2B', width=1, dash='dot') # Naranja UTA
+        ))
+        
+        # Configuración del layout
+        fig_animation.update_layout(
+            title=f"Posición Física del Péndulo (t={t_anim[i]:.2f}s)",
+            xaxis_title='Posición X (m)',
+            yaxis_title='Posición Y (m)',
+            xaxis_range=[-L*1.1, L*1.1],
+            yaxis_range=[-L*1.1, 0.1], 
+            showlegend=False,
+            template='plotly_white',
+            height=400
+        )
+        # Asegurar el aspecto 1:1 para que el movimiento se vea correcto (no estirado)
+        fig_animation.update_yaxes(scaleanchor="x", scaleratio=1) 
+
+        animation_placeholder.plotly_chart(fig_animation, use_container_width=True)
+        
+        # Pausa para controlar la velocidad de la animación (0.05 segundos por fotograma)
+        time.sleep(0.05) 
+    
     st.subheader("💡 Explicación Física")
     st.markdown(f"""
     * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde $\sin(\Theta) \approx \Theta$.
     * Para ángulos grandes (como los **{theta_0_deg:.2f}°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
     """)
+
 
 # ----------------------------------------------------
 # 3. Análisis de Parámetros (k y m) - Experimentación Virtual

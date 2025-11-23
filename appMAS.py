@@ -796,4 +796,49 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         # --- Gráfico ---
         st.subheader("📈 Gráfico de Superposición")
-        fig_super = go.
+        fig_super = go.Figure()
+        
+        fig_super.add_trace(go.Scatter(x=t_s, y=x_total, mode='lines', name='Oscilación Resultante ($x_1+x_2$)', line=dict(color='#25447C', width=2)))
+        
+        if st.checkbox("Mostrar Oscilaciones Individuales"):
+             fig_super.add_trace(go.Scatter(x=t_s, y=x1, mode='lines', name='x1', line=dict(color='#94B34A', width=1, dash='dot')))
+             fig_super.add_trace(go.Scatter(x=t_s, y=x2, mode='lines', name='x2', line=dict(color='#F89B2B', width=1, dash='dot')))
+        
+        fig_super.update_layout(
+            title='Superposición de Oscilaciones',
+            xaxis_title='Tiempo (s)',
+            yaxis_title='Posición (x) [m]',
+            template='plotly_white'
+        )
+        st.plotly_chart(fig_super, use_container_width=True)
+        
+        st.subheader("💡 Fenómeno de Batido (Beats)")
+        
+        # CÁLCULOS DE BATIDO (Aseguramos que siempre estén definidos antes de usarlos)
+        w_beat = abs(w1 - w2)
+        T_beat = 0.0
+        
+        if w_beat != 0:
+            T_beat = 2 * np.pi / w_beat
+        else:
+            T_beat = 99999.0 
+        
+        # Plantilla del Batido usando str.format()
+        beat_info_template = """
+* Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
+* La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \\text{{ rad/s}}**$. 
+* Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \\approx **{T_beat:.2f} \\text{{ s}}**$.
+        """
+        
+        if abs(w1 - w2) < 2:
+            # Mostrar la información completa si la diferencia es pequeña (Batido claro)
+            st.markdown(beat_info_template.format(w_beat=w_beat, T_beat=T_beat))
+            
+        else:
+            # Mostrar solo la diferencia de frecuencia y un mensaje si es grande
+            st.markdown("* Las frecuencias no son lo suficientemente cercanas para producir un fenómeno de batido claro.")
+            st.markdown("La diferencia de frecuencia es $\omega_{batido} = **{w_beat:.2f} \\text{{ rad/s}}**$.".format(w_beat=w_beat))
+
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("Desarrollado para Ingeniería Mecánica (UTA)")

@@ -60,10 +60,10 @@ def apply_custom_style():
             color: white;
         }
         .stButton>button {
-            background-color: #F89B2B; /* Naranja UTA */
+            background-color: #F89921; /* Naranja UTA (Ajustado para mejor visibilidad) */
             color: white;
             border-radius: 5px;
-            font-weight: bold; /* Hacer el texto del botón más legible */
+            font-weight: bold; 
         }
         h1, h2, h3 {
             color: #25447C; /* Azul Oscuro UTA */
@@ -502,8 +502,8 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     
     st.markdown("---")
     
-    # INICIALIZACIÓN DE VARIABLES CRÍTICAS (DEBEN EXISTIR FUERA DE CUALQUIER BLOQUE CONDICIONAL)
-    y_pos = 0 # Para animaciones horizontales
+    # INICIALIZACIÓN DE VARIABLES CRÍTICAS 
+    y_pos = 0 
     
     # ----------------------------------------------------
     # 4.1. MAS con Amortiguamiento
@@ -747,26 +747,23 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
         st.subheader("💡 Resonancia")
         
-        # Uso de str.format() para evitar el NameError en la inicialización de la f-string
         if omega_n > 0.0:
             
-            # Texto a mostrar (usando str.format para asegurar la evaluación tardía)
-            resonance_text = """
+            resonance_text = f"""
 * La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{{k/m}} = **{omega_n:.2f} \text{{\\ rad/s}}**$.
 * Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{{\\ rad/s}}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
 * Se observa el **régimen transitorio** al inicio y el **régimen estacionario** después de un tiempo, donde la masa oscila a la frecuencia de la fuerza externa.
-            """.format(omega_n=omega_n, w_f=w_f)
+            """
         
         else:
-            # Texto de fallback si los parámetros no son válidos (k<=0 o m<=0)
             resonance_text = """
 * La Frecuencia Natural ($\omega_n$) no se puede calcular. Por favor, asegúrese de que la Masa ($m$) y la Constante Elástica ($k$) sean mayores que cero.
             """
         
-        st.markdown(resonance_text) # Mostramos el texto generado condicionalmente.
+        st.markdown(resonance_text) 
 
     # ----------------------------------------------------
-    # 4.3. Superposición de Oscilaciones (USANDO F-STRINGS)
+    # 4.3. Superposición de Oscilaciones (ESTABLE)
     # ----------------------------------------------------
     elif extended_case == "Superposición de Oscilaciones":
         st.subheader("4.3. Superposición de Oscilaciones")
@@ -803,7 +800,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         # 
 
 [Image of graph showing the superposition of two sine waves resulting in a beat pattern]
-
+ 
         fig_super = go.Figure()
         
         fig_super.add_trace(go.Scatter(x=t_s, y=x_total, mode='lines', name='Oscilación Resultante ($x_1+x_2$)', line=dict(color='#25447C', width=2)))
@@ -831,11 +828,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         else:
             T_beat = 99999.0 
         
-        # *** CORRECCIÓN CRÍTICA: USAR F-STRING EN LUGAR DE .format() ***
-        
-        # Para escapar llaves en una f-string, usamos llaves dobles '{{' y '}}' para mostrar un literal de llave.
-        # Las variables se usan con llaves simples '{variable}'.
-        
+        # Uso de f-string con doble llave para escapar LaTeX (estos son los escapes estables)
         beat_info_text = f"""
 * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
 * La frecuencia de batido es $\omega_{{batido}} = |\\omega_1 - \\omega_2| = **{w_beat:.2f} \\text{{ rad/s}}**$. 
@@ -843,12 +836,10 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         """
         
         if abs(w1 - w2) < 2:
-            # Usamos la f-string directamente
             st.markdown(beat_info_text)
             
         else:
             st.markdown("* Las frecuencias no son lo suficientemente cercanas para producir un fenómeno de batido claro.")
-            # También usamos f-string en el 'else'
             st.markdown(f"La diferencia de frecuencia es $\\omega_{{batido}} = **{w_beat:.2f} \\text{{ rad/s}}**$.")
 
 

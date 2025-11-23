@@ -31,9 +31,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inicializar estado de sesión para el botón del péndulo
+# Inicializar estado de sesión para los botones de animación
 if 'pendulum_run' not in st.session_state:
     st.session_state.pendulum_run = False
+if 'mas_run' not in st.session_state:
+    st.session_state.mas_run = False
 
 # Estilo UTA
 def apply_custom_style():
@@ -171,6 +173,102 @@ if menu_selection == "1. Simulación Masa-Resorte":
         template='plotly_white'
     )
     st.plotly_chart(fig_energy, use_container_width=True)
+
+
+    # --- Sección de Animación Visual de Masa-Resorte ---
+    st.subheader("🎬 Animación Visual de Masa-Resorte")
+
+    # Función de callback para el botón
+    def start_mas_animation():
+        st.session_state.mas_run = True
+
+    # Botón de Play
+    if st.button("▶️ Iniciar Animación", key="btn_mas_start"):
+        start_mas_animation()
+
+    # Contenedor para la animación
+    animation_placeholder = st.empty()
+
+    # Parámetros visuales (Horizontal)
+    y_pos = 0  # Movimiento horizontal, y fijo en 0
+    range_limit = A * 1.2 # Rango para el eje x, con un margen
+
+    # Solo ejecutar el bucle si el estado es True
+    if st.session_state.mas_run:
+
+        st.markdown("Animación en curso. Ajusta los parámetros y vuelve a presionar el botón para reiniciar.")
+
+        # Reducir el número de puntos para una animación más fluida
+        t_anim = np.linspace(0, T_max, 50) 
+        x_anim = A * np.cos(omega * t_anim) # Posición de la masa (x(t))
+
+        for i in range(len(t_anim)):
+
+            # Crear la figura Plotly para la representación física
+            fig_animation = go.Figure()
+
+            # 1. Punto de Anclaje Fijo (La pared)
+            fig_animation.add_trace(go.Scatter(
+                x=[-range_limit], y=[y_pos],
+                mode='markers', name='Anclaje', 
+                marker=dict(size=10, color='red', symbol='square')
+            ))
+            
+            # 2. Resorte (Línea simple del anclaje a la masa)
+            fig_animation.add_trace(go.Scatter(
+                x=[-range_limit, x_anim[i]], y=[y_pos, y_pos],
+                mode='lines', name='Resorte', 
+                line=dict(color='gray', width=3, dash='dot')
+            ))
+
+            # 3. Traza de la Masa (Punto azul grande)
+            fig_animation.add_trace(go.Scatter(
+                x=[x_anim[i]], y=[y_pos],
+                mode='markers', name='Masa', 
+                marker=dict(size=30, color='#25447C', symbol='square')
+            ))
+
+            # Configuración del layout
+            fig_animation.update_layout(
+                title=f"Posición Física de la Masa (t={t_anim[i]:.2f}s)",
+                xaxis_title='Posición X (m)',
+                yaxis_title='',
+                xaxis_range=[-range_limit, range_limit],
+                yaxis_range=[-0.5, 0.5], 
+                showlegend=False,
+                template='plotly_white',
+                height=300
+            )
+            fig_animation.update_yaxes(visible=False) # Ocultar eje Y ya que el movimiento es horizontal
+
+            animation_placeholder.plotly_chart(fig_animation, use_container_width=True)
+
+            # Pausa para controlar la velocidad
+            time.sleep(0.05) 
+
+        # Al terminar la simulación, reseteamos el estado
+        st.session_state.mas_run = False
+        st.success("✅ Simulación completa. Ajuste los parámetros para volver a simular.")
+
+    else:
+        # Mostramos la posición inicial cuando no está corriendo
+        st.markdown("Presione **'Iniciar Animación'** para visualizar el movimiento horizontal.")
+
+        # Posición inicial (x[0] = A, ya que phi=0)
+        fig_initial = go.Figure()
+        fig_initial.add_trace(go.Scatter(x=[-range_limit], y=[y_pos], mode='markers', marker=dict(size=10, color='red', symbol='square')))
+        fig_initial.add_trace(go.Scatter(x=[-range_limit, x[0]], y=[y_pos, y_pos], mode='lines', line=dict(color='gray', width=3, dash='dot')))
+        fig_initial.add_trace(go.Scatter(x=[x[0]], y=[y_pos], mode='markers', marker=dict(size=30, color='#25447C', symbol='square')))
+
+        fig_initial.update_layout(
+            title="Posición Inicial de la Masa",
+            xaxis_title='Posición X (m)', yaxis_title='',
+            xaxis_range=[-range_limit, range_limit], yaxis_range=[-0.5, 0.5], 
+            showlegend=False, template='plotly_white', height=300
+        )
+        fig_initial.update_yaxes(visible=False)
+        animation_placeholder.plotly_chart(fig_initial, use_container_width=True)
+
     
 # ----------------------------------------------------
 # 2. Simulación Péndulo Simple
@@ -320,9 +418,11 @@ elif menu_selection == "2. Simulación Péndulo Simple":
 
 
     st.subheader("💡 Explicación Física")
-    # Línea corregida: usando r""" para manejar backslashes y $latex$
     st.markdown(r"""
     * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$. 
+
+[Image of simple pendulum diagram showing small angle approximation]
+
     * Para ángulos grandes (como los **%s°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
     """ % theta_0_deg)
 

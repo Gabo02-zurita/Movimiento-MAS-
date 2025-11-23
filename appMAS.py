@@ -503,8 +503,11 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     
     st.markdown("---")
     
-    # INICIALIZACIÓN DE VARIABLES CRÍTICAS (PARA EVITAR NAMERRORS AL CAMBIAR DE PESTAÑA)
+    # INICIALIZACIÓN DE VARIABLES CRÍTICAS (DEBEN EXISTIR FUERA DE CUALQUIER BLOQUE CONDICIONAL)
     y_pos = 0 # Para animaciones horizontales
+    
+    # Inicialización de variables de Resonancia y Batido para evitar NameErrors.
+    # Usamos valores neutrales.
     omega_n = 0.0
     w_beat = 0.0
     T_beat = 0.0
@@ -741,11 +744,19 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
             forced_placeholder.plotly_chart(fig_initial, use_container_width=True)
 
         st.subheader("💡 Resonancia")
-        st.markdown(f"""
-        * La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{k/m} = **{omega_n:.2f} \text{ rad/s}**$.
-        * Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{ rad/s}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
-        * Se observa el **régimen transitorio** al inicio y el **régimen estacionario** después de un tiempo, donde la masa oscila a la frecuencia de la fuerza externa.
-        """)
+        
+        # CORRECCIÓN DE ROBUSTEZ: Solo mostrar el markdown si omega_n no es el valor inicial de 0.0,
+        # lo que implica que el caso "MAS Forzado" está seleccionado y se ha calculado la variable.
+        if omega_n > 0.0:
+            st.markdown(f"""
+            * La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{k/m} = **{omega_n:.2f} \text{ rad/s}**$.
+            * Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{ rad/s}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
+            * Se observa el **régimen transitorio** al inicio y el **régimen estacionario** después de un tiempo, donde la masa oscila a la frecuencia de la fuerza externa.
+            """)
+        else:
+            # Fallback en caso de que k_f o m_f sean 0 o negativos al inicio
+            st.markdown("* La Frecuencia Natural se calculará al definir $k$ y $m$ con valores positivos.")
+
 
     # ----------------------------------------------------
     # 4.3. Superposición de Oscilaciones

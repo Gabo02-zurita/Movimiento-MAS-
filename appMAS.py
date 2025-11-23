@@ -12,6 +12,7 @@ st.set_page_config(
 
 # Estilo UTA
 def apply_custom_style():
+    # Estilo básico de la UTA (Azul Oscuro, Naranja)
     st.markdown("""
         <style>
         .reportview-container {
@@ -47,7 +48,7 @@ st.title("⚙️ Simulador Interactivo de Movimiento Armónico Simple (MAS)")
 st.header("Análisis de Fenómenos Físicos para Ingeniería Mecánica (UTA)")
 st.markdown("---")
 
-# --- Funciones de Simulación ---
+# --- Funciones de Simulación (ODEs) ---
 
 # Ecuación diferencial para el Péndulo Simple (No Lineal)
 def pendulum_ode(y, t, g, L):
@@ -89,9 +90,6 @@ if menu_selection == "1. Simulación Masa-Resorte":
     st.header("1️⃣ Simulación de Masa-Resorte")
     st.markdown("Este módulo permite analizar las variables cinemáticas y energéticas del sistema masa-resorte.")
     
-
-[Image of mass-spring system in simple harmonic motion]
-
     st.subheader("📚 Fundamentos Teóricos")
     st.latex(r"x(t) = A \cos(\omega t + \phi)")
     st.latex(r"\omega = \sqrt{\frac{k}{m}} \quad \text{(Frecuencia Angular)}")
@@ -99,7 +97,7 @@ if menu_selection == "1. Simulación Masa-Resorte":
     st.markdown("""
     * **Posición ($x$):** Describe la ubicación de la masa en cualquier instante.
     * **Velocidad ($v$):** Máxima en el punto de equilibrio ($x=0$), nula en los extremos.
-    * **Aceleración ($a$):** Proporcional a la posición ($a = -\omega^2 x$), dirigida al punto de equilibrio (Ley de Hooke).
+    * **Aceleración ($a$):** Proporcional a la posición ($a = -\omega^2 x$), dirigida al punto de equilibrio (**Ley de Hooke**).
     """)
     
     st.subheader("🛠️ Parámetros del Sistema")
@@ -243,8 +241,8 @@ elif menu_selection == "3. Análisis de Parámetros ($k$ y $m$)":
     st.markdown("El periodo de oscilación ($T$) de un sistema masa-resorte está dado por:")
     st.latex(r"T = 2\pi \sqrt{\frac{m}{k}}")
     st.markdown("""
-    * **Aumento de $m$ (Masa):** Aumenta la **inercia** del sistema, dificultando el cambio de movimiento. Esto **aumenta el periodo ($T$)** y disminuye la frecuencia.
-    * **Aumento de $k$ (Constante Elástica):** Aumenta la **rigidez** del resorte, resultando en una mayor fuerza restauradora. Esto **disminuye el periodo ($T$)** y aumenta la frecuencia.
+    * **Aumento de $m$ (Masa):** Aumenta la **inercia** del sistema. Esto **aumenta el periodo ($T$)** y disminuye la frecuencia.
+    * **Aumento de $k$ (Constante Elástica):** Aumenta la **rigidez** del resorte. Esto **disminuye el periodo ($T$)** y aumenta la frecuencia.
     """)
     
     st.subheader("🔬 Experimentación Virtual")
@@ -306,9 +304,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.subheader("4.1. MAS con Amortiguamiento")
         st.markdown("Se añade una fuerza de arrastre proporcional a la velocidad ($\mathbf{F_c} = -c \mathbf{v}$).")
         
-
-[Image of a damped simple harmonic oscillator]
-
         
         st.subheader("🛠️ Parámetros y Ecuación")
         
@@ -358,9 +353,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.subheader("4.2. MAS Forzado")
         st.markdown("Se añade una fuerza externa periódica ($\mathbf{F_{ext}} = F_0 \cos(\omega_f t)$) al sistema amortiguado.")
         
-
-[Image of a forced mass-spring system]
-
         
         st.subheader("🛠️ Parámetros y Ecuación")
         
@@ -410,7 +402,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.markdown("Se analiza la suma de dos movimientos armónicos simples con frecuencias y amplitudes diferentes. Se pueden generar los fenómenos de **batido** (Beats).")
         
 
-[Image of a beat frequency pattern graph]
+[Image of a beat frequency pattern resulting from the superposition of two waves]
 
         
         st.subheader("🛠️ Parámetros de las Dos Oscilaciones")

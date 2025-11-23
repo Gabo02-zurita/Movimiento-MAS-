@@ -504,6 +504,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     st.markdown("---")
     
     # CORRECCIÓN DE NAMERROR #1: Definir y_pos para las animaciones horizontales
+    # Esto asegura que y_pos exista para todas las subsecciones de animación.
     y_pos = 0 
     
     # ----------------------------------------------------
@@ -646,14 +647,15 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
         T_max_f = st.slider("Tiempo Máximo de Simulación ($t_{max}$) [s] | Forzado", 5.0, 50.0, 30.0, 1.0)
         
+        # CÁLCULO CORREGIDO: Definido antes de la simulación ODE
+        omega_n = np.sqrt(k_f / m_f)
+        
         # Simulación
         t_f = np.linspace(0, T_max_f, 1000)
         y0_f = [0.0, 0.0]  # [Posición inicial, Velocidad inicial]
         sol_f = odeint(forced_mas_ode, y0_f, t_f, args=(k_f, m_f, c_f, F0, w_f))
         x_f = sol_f[:, 0]
         
-        # CORRECCIÓN DE NAMERROR #2: Mover el cálculo aquí
-        omega_n = np.sqrt(k_f / m_f)
         
         # --- Gráfico de Posición vs. Tiempo ---
         st.subheader("📈 Gráfico de Posición vs. Tiempo")
@@ -796,7 +798,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         st.subheader("💡 Fenómeno de Batido (Beats)")
         if abs(w1 - w2) < 2:
-            # CORRECCIÓN DE NAMERROR #3: Calcular w_beat y T_beat aquí
+            # CÁLCULO CORREGIDO: Definido dentro del condicional donde se usa
             w_beat = abs(w1 - w2)
             T_beat = 2 * np.pi / w_beat
             st.markdown(f"""

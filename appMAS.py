@@ -797,10 +797,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         # --- Gráfico ---
         st.subheader("📈 Gráfico de Superposición")
-        # 
-
-[Image of graph showing the superposition of two sine waves resulting in a beat pattern]
- 
+        
         fig_super = go.Figure()
         
         fig_super.add_trace(go.Scatter(x=t_s, y=x_total, mode='lines', name='Oscilación Resultante ($x_1+x_2$)', line=dict(color='#25447C', width=2)))
@@ -828,7 +825,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         else:
             T_beat = 99999.0 
         
-        # Uso de f-string con doble llave para escapar LaTeX (estos son los escapes estables)
+        # Uso de f-string con doble llave para escapar LaTeX (escapes estables)
         beat_info_text = f"""
 * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
 * La frecuencia de batido es $\omega_{{batido}} = |\\omega_1 - \\omega_2| = **{w_beat:.2f} \\text{{ rad/s}}**$. 

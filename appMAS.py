@@ -424,9 +424,6 @@ elif menu_selection == "2. Simulación Péndulo Simple":
     st.subheader("💡 Explicación Física")
     st.markdown(r"""
     * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$. 
-
-[Image of simple pendulum diagram showing small angle approximation]
-
     * Para ángulos grandes (como los **%s°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
     """ % theta_0_deg)
 
@@ -444,7 +441,7 @@ elif menu_selection == "3. Análisis de Parámetros ($k$ y $m$)":
     st.latex(r"T = 2\pi \sqrt{\frac{m}{k}}")
     st.markdown("""
     * **Aumento de $m$ (Masa):** Aumenta la **inercia** del sistema. Esto **aumenta el periodo ($T$)** y disminuye la frecuencia.
-    * **Aumento de $k$ (Constante Elástica):** Aumenta la **rigidez** del resorte. Esto **disminuye el periodo ($T$)** y aumenta la frecuencia.
+    * **Aumento de $k$ (Constante Elástica):** Aumenta la **rigidez** del resistema. Esto **disminuye el periodo ($T$)** y aumenta la frecuencia.
     """)
     
     st.subheader("🔬 Experimentación Virtual")
@@ -507,8 +504,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     y_pos = 0 # Para animaciones horizontales
     
     # Inicialización de variables de Resonancia y Batido para evitar NameErrors.
-    # Usamos None o 0.0, pero para la f-string usaremos un truco de concatenación si es necesario.
-    # Usamos 0.0 para compatibilidad con .2f, pero haremos la generación de la cadena condicional.
     omega_n = 0.0
     w_beat = 0.0
     T_beat = 0.0
@@ -653,12 +648,11 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
         T_max_f = st.slider("Tiempo Máximo de Simulación ($t_{max}$) [s] | Forzado", 5.0, 50.0, 30.0, 1.0)
         
-        # CÁLCULO DE omega_n (sobrescribe el valor inicial de 0.0)
-        # Solo calcular si los parámetros son válidos para evitar np.sqrt(negativo)
+        # CÁLCULO DE omega_n
         if m_f > 0 and k_f > 0:
             omega_n = np.sqrt(k_f / m_f)
         else:
-            omega_n = 0.0 # Aseguramos un valor válido
+            omega_n = 0.0 
         
         # Simulación
         t_f = np.linspace(0, T_max_f, 1000)
@@ -670,7 +664,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         # --- Gráfico de Posición vs. Tiempo ---
         st.subheader("📈 Gráfico de Posición vs. Tiempo")
         
-        # CORRECCIÓN DE ROBUSTEZ: Usar omega_n en el título.
         title_forced = f'MAS Forzado (Frecuencia Natural $\omega_n$ = {omega_n:.2f} rad/s)'
         if omega_n == 0.0:
             title_forced = 'MAS Forzado (Frecuencia Natural no definida/cero)'
@@ -686,7 +679,8 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         )
         st.plotly_chart(fig_forced, use_container_width=True)
 
-        # --- Animación Visual Forzada ---
+        # --- Animación Visual Forzada (Omitida por brevedad) ---
+
         st.subheader("🎬 Animación Visual Forzada")
 
         def start_forced_animation():
@@ -756,15 +750,16 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
         st.subheader("💡 Resonancia")
         
-        # CORRECCIÓN DEFINITIVA DE ROBUSTEZ: Construir el texto solo si omega_n fue calculado con éxito.
-        # Esto reemplaza el st.markdown problemático.
+        # CORRECCIÓN DEFINITIVA FINAL: Uso de str.format() en lugar de f-string en el bloque sensible.
         if omega_n > 0.0:
-            # Texto a mostrar si los parámetros son válidos
-            resonance_text = f"""
-            * La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{k/m} = **{omega_n:.2f} \text{ rad/s}**$.
-            * Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{ rad/s}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
+            
+            # Texto a mostrar (usando str.format para asegurar la evaluación tardía)
+            resonance_text = """
+            * La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{{k/m}} = **{omega_n:.2f} \text{{ rad/s}}**$.
+            * Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{{ rad/s}}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
             * Se observa el **régimen transitorio** al inicio y el **régimen estacionario** después de un tiempo, donde la masa oscila a la frecuencia de la fuerza externa.
-            """
+            """.format(omega_n=omega_n, w_f=w_f)
+        
         else:
             # Texto de fallback si los parámetros no son válidos (k<=0 o m<=0)
             resonance_text = """
@@ -772,7 +767,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
             """
         
         st.markdown(resonance_text) # Mostramos el texto generado condicionalmente.
-
+        
 
     # ----------------------------------------------------
     # 4.3. Superposición de Oscilaciones
@@ -832,13 +827,17 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
             if w_beat != 0:
                 T_beat = 2 * np.pi / w_beat
             else:
-                T_beat = np.inf # O un valor muy grande si la diferencia es cero
+                T_beat = 99999.0 # Valor grande en lugar de infinito para el formateo
                 
             st.markdown(f"""
             * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
-            * La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \text{ rad/s}**$. 
-            * Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \approx **{T_beat:.2f} \text{ s}**$.
+            * La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \text{{ rad/s}}**$. 
+            * Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \approx **{T_beat:.2f} \text{{ s}}**$.
             """)
+            
+
+[Image of graph showing the beats phenomenon created by superposing two waves]
+
         else:
             st.markdown("* Las frecuencias no son lo suficientemente cercanas para producir un fenómeno de batido claro.")
 

@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from scipy.integrate import odeint
-import time # <<< NECESARIO PARA LA ANIMACIÓN VISUAL
+import time 
 
 # --- Funciones de Simulación (ODEs) ---
 
@@ -31,6 +31,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inicializar estado de sesión para el botón del péndulo
+if 'pendulum_run' not in st.session_state:
+    st.session_state.pendulum_run = False
+
 # Estilo UTA
 def apply_custom_style():
     # Estilo básico de la UTA (Azul Oscuro, Naranja)
@@ -53,6 +57,7 @@ def apply_custom_style():
             background-color: #F89B2B; /* Naranja UTA */
             color: white;
             border-radius: 5px;
+            font-weight: bold; /* Hacer el texto del botón más legible */
         }
         h1, h2, h3 {
             color: #25447C; /* Azul Oscuro UTA */
@@ -176,6 +181,10 @@ elif menu_selection == "2. Simulación Péndulo Simple":
     st.markdown("Análisis de las oscilaciones de un péndulo simple, comparando el modelo lineal (MAS) con la solución no lineal (Ecuación completa).")
     st.subheader("🛠️ Parámetros del Sistema")
     
+    # Función de callback para el botón
+    def start_pendulum_animation():
+        st.session_state.pendulum_run = True
+
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -221,66 +230,95 @@ elif menu_selection == "2. Simulación Péndulo Simple":
     
     # --- Sección de Animación Visual ---
     
+    st.subheader("🎬 Animación Visual del Péndulo Simple")
+
+    # Botón de Play
+    if st.button("▶️ Iniciar Animación", key="btn_pendulum_start"):
+        start_pendulum_animation()
+    
     # 1. Calcular coordenadas cartesianas (X, Y)
-    # Suspensión en (0, 0). Y es negativo (hacia abajo)
     x_coords = L * np.sin(theta_nonlin)
     y_coords = -L * np.cos(theta_nonlin)
 
-    st.subheader("🎬 Animación Visual del Péndulo Simple")
-    st.markdown("La simulación visual muestra la posición de la masa durante el movimiento en tiempo real.")
-
+    # Contenedor para la animación
     animation_placeholder = st.empty()
     
-    # Reducir el número de puntos para una animación más fluida (solo 50 fotogramas)
-    t_anim = np.linspace(0, T_max, 50) 
-    x_anim = np.interp(t_anim, t, x_coords)
-    y_anim = np.interp(t_anim, t, y_coords)
+    # Solo ejecutar el bucle si el estado es True (el botón fue presionado)
+    if st.session_state.pendulum_run:
+        
+        st.markdown("Animación en curso. Ajusta los parámetros y vuelve a presionar el botón para reiniciar.")
+        
+        # Reducir el número de puntos para una animación más fluida
+        t_anim = np.linspace(0, T_max, 50) 
+        x_anim = np.interp(t_anim, t, x_coords)
+        y_anim = np.interp(t_anim, t, y_coords)
 
-    for i in range(len(t_anim)):
+        for i in range(len(t_anim)):
+            
+            # Crear la figura Plotly para la representación física
+            fig_animation = go.Figure()
+            
+            # 1. Traza de la Cuerda (Línea desde el origen hasta la masa)
+            fig_animation.add_trace(go.Scatter(
+                x=[0, x_anim[i]], y=[0, y_anim[i]],
+                mode='lines', name='Cuerda (L)', 
+                line=dict(color='gray', width=2)
+            ))
+            
+            # 2. Traza de la Masa (Punto)
+            fig_animation.add_trace(go.Scatter(
+                x=[x_anim[i]], y=[y_anim[i]],
+                mode='markers', name='Masa', 
+                marker=dict(size=20, color='#25447C')
+            ))
+            
+            # 3. Trayectoria (Para contexto visual)
+            fig_animation.add_trace(go.Scatter(
+                x=x_coords, y=y_coords,
+                mode='lines', name='Trayectoria', 
+                line=dict(color='#F89B2B', width=1, dash='dot')
+            ))
+            
+            # Configuración del layout
+            fig_animation.update_layout(
+                title=f"Posición Física del Péndulo (t={t_anim[i]:.2f}s)",
+                xaxis_title='Posición X (m)',
+                yaxis_title='Posición Y (m)',
+                xaxis_range=[-L*1.1, L*1.1],
+                yaxis_range=[-L*1.1, 0.1], 
+                showlegend=False,
+                template='plotly_white',
+                height=400
+            )
+            fig_animation.update_yaxes(scaleanchor="x", scaleratio=1) 
+
+            animation_placeholder.plotly_chart(fig_animation, use_container_width=True)
+            
+            # Pausa para controlar la velocidad
+            time.sleep(0.05) 
+            
+        # Al terminar la simulación, reseteamos el estado para que el botón funcione de nuevo
+        st.session_state.pendulum_run = False
+        st.success("✅ Simulación completa. Ajuste los parámetros para volver a simular.")
         
-        # Crear la figura Plotly para la representación física
-        fig_animation = go.Figure()
+    else:
+        # Mostramos la posición inicial cuando no está corriendo
+        st.markdown("Presione **'Iniciar Animación'** para visualizar el movimiento.")
         
-        # 1. Traza de la Cuerda (Línea desde el origen hasta la masa)
-        fig_animation.add_trace(go.Scatter(
-            x=[0, x_anim[i]], y=[0, y_anim[i]],
-            mode='lines', name='Cuerda (L)', 
-            line=dict(color='gray', width=2)
-        ))
-        
-        # 2. Traza de la Masa (Punto)
-        fig_animation.add_trace(go.Scatter(
-            x=[x_anim[i]], y=[y_anim[i]],
-            mode='markers', name='Masa', 
-            marker=dict(size=20, color='#25447C') # Azul UTA
-        ))
-        
-        # 3. Trayectoria (Para contexto visual, usar todos los puntos calculados)
-        fig_animation.add_trace(go.Scatter(
-            x=x_coords, y=y_coords,
-            mode='lines', name='Trayectoria', 
-            line=dict(color='#F89B2B', width=1, dash='dot') # Naranja UTA
-        ))
-        
-        # Configuración del layout
-        fig_animation.update_layout(
-            title=f"Posición Física del Péndulo (t={t_anim[i]:.2f}s)",
-            xaxis_title='Posición X (m)',
-            yaxis_title='Posición Y (m)',
-            xaxis_range=[-L*1.1, L*1.1],
-            yaxis_range=[-L*1.1, 0.1], 
-            showlegend=False,
-            template='plotly_white',
-            height=400
+        fig_initial = go.Figure()
+        fig_initial.add_trace(go.Scatter(x=[0, x_coords[0]], y=[0, y_coords[0]], mode='lines', line=dict(color='gray', width=2)))
+        fig_initial.add_trace(go.Scatter(x=[x_coords[0]], y=[y_coords[0]], mode='markers', marker=dict(size=20, color='#25447C')))
+        fig_initial.add_trace(go.Scatter(x=x_coords, y=y_coords, mode='lines', line=dict(color='#F89B2B', width=1, dash='dot')))
+        fig_initial.update_layout(
+            title="Posición Inicial del Péndulo",
+            xaxis_title='Posición X (m)', yaxis_title='Posición Y (m)',
+            xaxis_range=[-L*1.1, L*1.1], yaxis_range=[-L*1.1, 0.1], 
+            showlegend=False, template='plotly_white', height=400
         )
-        # Asegurar el aspecto 1:1 para que el movimiento se vea correcto (no estirado)
-        fig_animation.update_yaxes(scaleanchor="x", scaleratio=1) 
+        fig_initial.update_yaxes(scaleanchor="x", scaleratio=1)
+        animation_placeholder.plotly_chart(fig_initial, use_container_width=True)
 
-        animation_placeholder.plotly_chart(fig_animation, use_container_width=True)
-        
-        # Pausa para controlar la velocidad de la animación (0.05 segundos por fotograma)
-        time.sleep(0.05) 
-    
+
     st.subheader("💡 Explicación Física")
     st.markdown(f"""
     * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde $\sin(\Theta) \approx \Theta$.

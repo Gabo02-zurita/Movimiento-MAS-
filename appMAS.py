@@ -423,10 +423,7 @@ elif menu_selection == "2. Simulación Péndulo Simple":
 
     st.subheader("💡 Explicación Física")
     st.markdown(r"""
-    * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$. 
-
-[Image of simple pendulum diagram showing small angle approximation]
-
+    * El **Modelo Lineal** (MAS) es una aproximación válida solo para **ángulos iniciales pequeños** ($\Theta_0 < 10^\circ$), donde se aplica la **aproximación de ángulo pequeño**: $\sin(\Theta) \approx \Theta$.
     * Para ángulos grandes (como los **%s°** simulados), el **Modelo No Lineal** es necesario y muestra un periodo ligeramente más largo y una forma de onda menos perfectamente cosenoidal, con una diferencia clara en la gráfica.
     """ % theta_0_deg)
 
@@ -503,6 +500,9 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     
     st.markdown("---")
     
+    # CORRECCIÓN DE NAMERROR: Definir y_pos para las animaciones horizontales
+    y_pos = 0 
+    
     # ----------------------------------------------------
     # 4.1. MAS con Amortiguamiento
     # ----------------------------------------------------
@@ -555,7 +555,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
             start_damped_animation()
 
         damped_placeholder = st.empty()
-        y_pos = 0 
         range_limit = A_d * 1.2 # Rango basado en la amplitud inicial
 
         if st.session_state.damped_run:
@@ -680,9 +679,6 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         A_max = np.max(np.abs(x_f))
         range_limit_f = A_max * 1.2
         
-        # Usaremos solo la última parte de la simulación (régimen estacionario) para la animación
-        # Pero para que sea simple, usaré toda la solución x_f
-        
         if st.session_state.forced_run:
             st.markdown("Animación en curso. La masa se estabiliza oscilando a la frecuencia forzada.")
             
@@ -801,7 +797,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
             st.markdown(f"""
             * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**.
             * La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \text{ rad/s}**$.
-            * Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \approx **{T_beat:.2f} \text{ s}**$. 
+            * Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \approx **{T_beat:.2f} \text{ s}**$.
             """)
         else:
             st.markdown("* Las frecuencias no son lo suficientemente cercanas para producir un fenómeno de batido claro.")

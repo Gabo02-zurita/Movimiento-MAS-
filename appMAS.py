@@ -507,7 +507,8 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
     y_pos = 0 # Para animaciones horizontales
     
     # Inicialización de variables de Resonancia y Batido para evitar NameErrors.
-    # Usamos valores neutrales.
+    # Usamos None o 0.0, pero para la f-string usaremos un truco de concatenación si es necesario.
+    # Usamos 0.0 para compatibilidad con .2f, pero haremos la generación de la cadena condicional.
     omega_n = 0.0
     w_beat = 0.0
     T_beat = 0.0
@@ -653,7 +654,11 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         T_max_f = st.slider("Tiempo Máximo de Simulación ($t_{max}$) [s] | Forzado", 5.0, 50.0, 30.0, 1.0)
         
         # CÁLCULO DE omega_n (sobrescribe el valor inicial de 0.0)
-        omega_n = np.sqrt(k_f / m_f)
+        # Solo calcular si los parámetros son válidos para evitar np.sqrt(negativo)
+        if m_f > 0 and k_f > 0:
+            omega_n = np.sqrt(k_f / m_f)
+        else:
+            omega_n = 0.0 # Aseguramos un valor válido
         
         # Simulación
         t_f = np.linspace(0, T_max_f, 1000)
@@ -664,11 +669,17 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         # --- Gráfico de Posición vs. Tiempo ---
         st.subheader("📈 Gráfico de Posición vs. Tiempo")
+        
+        # CORRECCIÓN DE ROBUSTEZ: Usar omega_n en el título.
+        title_forced = f'MAS Forzado (Frecuencia Natural $\omega_n$ = {omega_n:.2f} rad/s)'
+        if omega_n == 0.0:
+            title_forced = 'MAS Forzado (Frecuencia Natural no definida/cero)'
+            
         fig_forced = go.Figure(data=[
             go.Scatter(x=t_f, y=x_f, mode='lines', name=f'Posición (w_f={w_f} rad/s)', line=dict(color='#F89B2B', width=2))
         ])
         fig_forced.update_layout(
-            title=f'MAS Forzado (Frecuencia Natural $\omega_n$ = {omega_n:.2f} rad/s)',
+            title=title_forced,
             xaxis_title='Tiempo (s)',
             yaxis_title='Posición (x) [m]',
             template='plotly_white'
@@ -745,17 +756,22 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
         st.subheader("💡 Resonancia")
         
-        # CORRECCIÓN DE ROBUSTEZ: Solo mostrar el markdown si omega_n no es el valor inicial de 0.0,
-        # lo que implica que el caso "MAS Forzado" está seleccionado y se ha calculado la variable.
+        # CORRECCIÓN DEFINITIVA DE ROBUSTEZ: Construir el texto solo si omega_n fue calculado con éxito.
+        # Esto reemplaza el st.markdown problemático.
         if omega_n > 0.0:
-            st.markdown(f"""
+            # Texto a mostrar si los parámetros son válidos
+            resonance_text = f"""
             * La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{k/m} = **{omega_n:.2f} \text{ rad/s}**$.
             * Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{ rad/s}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
             * Se observa el **régimen transitorio** al inicio y el **régimen estacionario** después de un tiempo, donde la masa oscila a la frecuencia de la fuerza externa.
-            """)
+            """
         else:
-            # Fallback en caso de que k_f o m_f sean 0 o negativos al inicio
-            st.markdown("* La Frecuencia Natural se calculará al definir $k$ y $m$ con valores positivos.")
+            # Texto de fallback si los parámetros no son válidos (k<=0 o m<=0)
+            resonance_text = """
+            * La Frecuencia Natural ($\omega_n$) no se puede calcular. Por favor, asegúrese de que la Masa ($m$) y la Constante Elástica ($k$) sean mayores que cero.
+            """
+        
+        st.markdown(resonance_text) # Mostramos el texto generado condicionalmente.
 
 
     # ----------------------------------------------------
@@ -813,9 +829,13 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         if abs(w1 - w2) < 2:
             # CÁLCULO DE w_beat y T_beat (sobrescribe los valores iniciales de 0.0)
             w_beat = abs(w1 - w2)
-            T_beat = 2 * np.pi / w_beat
+            if w_beat != 0:
+                T_beat = 2 * np.pi / w_beat
+            else:
+                T_beat = np.inf # O un valor muy grande si la diferencia es cero
+                
             st.markdown(f"""
-            * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**.
+            * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
             * La frecuencia de batido es $\omega_{batido} = |\omega_1 - \omega_2| = **{w_beat:.2f} \text{ rad/s}**$. 
             * Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \approx **{T_beat:.2f} \text{ s}**$.
             """)

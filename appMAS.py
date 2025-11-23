@@ -265,9 +265,13 @@ if menu_selection == "1. Simulación Masa-Resorte":
 
         fig_initial.update_layout(
             title="Posición Inicial de la Masa",
-            xaxis_title='Posición X (m)', yaxis_title='',
-            xaxis_range=[-range_limit, range_limit], yaxis_range=[-0.5, 0.5], 
-            showlegend=False, template='plotly_white', height=300
+            xaxis_title='Posición X (m)',
+            yaxis_title='',
+            xaxis_range=[-range_limit, range_limit],
+            yaxis_range=[-0.5, 0.5], 
+            showlegend=False,
+            template='plotly_white',
+            height=300
         )
         fig_initial.update_yaxes(visible=False)
         animation_placeholder.plotly_chart(fig_initial, use_container_width=True)
@@ -748,8 +752,8 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
             
             # Texto a mostrar (usando str.format para asegurar la evaluación tardía)
             resonance_text = """
-* La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{{k/m}} = **{omega_n:.2f} \text{{ rad/s}}**$.
-* Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{{ rad/s}}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
+* La **Frecuencia Natural** del sistema es $\omega_n = \sqrt{{k/m}} = **{omega_n:.2f} \text{{\\ rad/s}}**$.
+* Si la frecuencia de la fuerza externa ($\omega_f = **{w_f:.2f} \text{{\\ rad/s}}**$) se acerca a $\omega_n$, se produce la **Resonancia**, llevando a un gran incremento en la amplitud de oscilación.
 * Se observa el **régimen transitorio** al inicio y el **régimen estacionario** después de un tiempo, donde la masa oscila a la frecuencia de la fuerza externa.
             """.format(omega_n=omega_n, w_f=w_f)
         
@@ -762,7 +766,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.markdown(resonance_text) # Mostramos el texto generado condicionalmente.
 
     # ----------------------------------------------------
-    # 4.3. Superposición de Oscilaciones (CORREGIDO EL KEYERROR DEFINITIVAMENTE)
+    # 4.3. Superposición de Oscilaciones (USANDO F-STRINGS)
     # ----------------------------------------------------
     elif extended_case == "Superposición de Oscilaciones":
         st.subheader("4.3. Superposición de Oscilaciones")
@@ -796,7 +800,10 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         
         # --- Gráfico ---
         st.subheader("📈 Gráfico de Superposición")
-        #  <-- Comentario para el diagrama
+        # 
+
+[Image of graph showing the superposition of two sine waves resulting in a beat pattern]
+
         fig_super = go.Figure()
         
         fig_super.add_trace(go.Scatter(x=t_s, y=x_total, mode='lines', name='Oscilación Resultante ($x_1+x_2$)', line=dict(color='#25447C', width=2)))
@@ -824,20 +831,25 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         else:
             T_beat = 99999.0 
         
-        # Plantilla del Batido (Corregido el escape de LaTeX en \text{} para .format)
-        beat_info_template = """
+        # *** CORRECCIÓN CRÍTICA: USAR F-STRING EN LUGAR DE .format() ***
+        
+        # Para escapar llaves en una f-string, usamos llaves dobles '{{' y '}}' para mostrar un literal de llave.
+        # Las variables se usan con llaves simples '{variable}'.
+        
+        beat_info_text = f"""
 * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
-* La frecuencia de batido es $\omega_{batido} = |\\omega_1 - \\omega_2| = **{w_beat:.2f} \text{{\\ rad/s}}**$. 
-* Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \\approx **{T_beat:.2f} \text{{\\ s}}**$.
+* La frecuencia de batido es $\omega_{{batido}} = |\\omega_1 - \\omega_2| = **{w_beat:.2f} \\text{{ rad/s}}**$. 
+* Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{{batido}} \\approx **{T_beat:.2f} \\text{{ s}}**$.
         """
         
         if abs(w1 - w2) < 2:
-            st.markdown(beat_info_template.format(w_beat=w_beat, T_beat=T_beat))
+            # Usamos la f-string directamente
+            st.markdown(beat_info_text)
             
         else:
             st.markdown("* Las frecuencias no son lo suficientemente cercanas para producir un fenómeno de batido claro.")
-            # Aseguramos el escape correcto para la opción 'else' también
-            st.markdown("La diferencia de frecuencia es $\\omega_{batido} = **{w_beat:.2f} \text{{\\ rad/s}}**$.".format(w_beat=w_beat))
+            # También usamos f-string en el 'else'
+            st.markdown(f"La diferencia de frecuencia es $\\omega_{{batido}} = **{w_beat:.2f} \\text{{ rad/s}}**$.")
 
 
 st.sidebar.markdown("---")

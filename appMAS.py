@@ -762,7 +762,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         st.markdown(resonance_text) # Mostramos el texto generado condicionalmente.
 
     # ----------------------------------------------------
-    # 4.3. Superposición de Oscilaciones (Corregido el KeyError)
+    # 4.3. Superposición de Oscilaciones (CORREGIDO EL KEYERROR DEFINITIVAMENTE)
     # ----------------------------------------------------
     elif extended_case == "Superposición de Oscilaciones":
         st.subheader("4.3. Superposición de Oscilaciones")
@@ -797,6 +797,9 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         # --- Gráfico ---
         st.subheader("📈 Gráfico de Superposición")
         
+
+[Image of graph showing the superposition of two sine waves resulting in a beat pattern]
+
         fig_super = go.Figure()
         
         fig_super.add_trace(go.Scatter(x=t_s, y=x_total, mode='lines', name='Oscilación Resultante ($x_1+x_2$)', line=dict(color='#25447C', width=2)))
@@ -824,11 +827,12 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         else:
             T_beat = 99999.0 
         
-        # Plantilla del Batido: Se aseguran las dobles llaves `{{` y `}}` en la sintaxis LaTeX
+        # Plantilla del Batido: Se usa la sintaxis de Streamlit y se escapa solo lo necesario.
+        # Quitamos \text{} y dependemos del parser de Streamlit.
         beat_info_template = """
 * Si las frecuencias ($\omega_1$ y $\omega_2$) son muy cercanas, se produce el fenómeno de **Batido**. 
-* La frecuencia de batido es $\omega_{batido} = |\\omega_1 - \\omega_2| = **{w_beat:.2f} \\text{{\\ rad/s}}**$. 
-* Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \\approx **{T_beat:.2f} \\text{{\\ s}}**$.
+* La frecuencia de batido es $\omega_{batido} = |\\omega_1 - \\omega_2| = **{w_beat:.2f} \text{{ rad/s}}**$. 
+* Esto se manifiesta como una amplitud que varía lentamente, con un periodo de batido de $T_{batido} \\approx **{T_beat:.2f} \text{{ s}}**$.
         """
         
         if abs(w1 - w2) < 2:
@@ -837,7 +841,7 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
         else:
             st.markdown("* Las frecuencias no son lo suficientemente cercanas para producir un fenómeno de batido claro.")
             # Aseguramos el escape correcto para la opción 'else' también
-            st.markdown("La diferencia de frecuencia es $\\omega_{batido} = **{w_beat:.2f} \\text{{\\ rad/s}}**$.".format(w_beat=w_beat))
+            st.markdown("La diferencia de frecuencia es $\\omega_{batido} = **{w_beat:.2f} \text{{ rad/s}}**$.".format(w_beat=w_beat))
 
 
 st.sidebar.markdown("---")

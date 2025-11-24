@@ -841,4 +841,4 @@ elif menu_selection == "4. Casos Extendidos (Amortiguado, Forzado, Superposició
 
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("Desarrollado para Ingeniería Mecánica (UTA)")
+st.sidebar.markdown("Desarrollado por grupo el grupo E para Fisica 2")
